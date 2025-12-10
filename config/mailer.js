@@ -1,10 +1,12 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.hostinger.com", // Hostinger SMTP host
+  port: 465, // SSL ke liye
+  secure: true,
   auth: {
-    user: "danishshakeel992@gmail.com",
-    pass: "vece recp recm cpbw",
+    user: "noreply@rewipay.com",
+    pass: "12345Rewipay$",
   },
   debug: true,
   logger: true,
@@ -12,7 +14,7 @@ const transporter = nodemailer.createTransport({
 
 export const sendEmail = async (to, subject, text) => {
   await transporter.sendMail({
-    from: `"RewiPay" <${process.env.EMAIL_USER}>`,
+    from: `"RewiPay" <noreply@rewipay.com>`,
     to,
     subject,
     text,
