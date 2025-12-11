@@ -16,7 +16,7 @@ router.post("/forgot-password", forgotPassword);
 router.post("/verify-otp", verifyOTP);
 router.post("/reset-password", resetPassword);
 
-// analytics
+// analytics s
 router.get("/analytics", getAnalytics);
 
 export default router;
