@@ -1,6 +1,44 @@
 
 import { v4 as uuidv4 } from "uuid";
 import Product from "../models/Product.js";
+import bcrypt from "bcryptjs";
+import User from "../models/User.js";
+
+// auth admin
+export const adminLoginForm = (req, res) => {
+    res.render("admin_login", { layout: false });
+};
+
+// Handle login
+export const adminLogin = async (req, res) => {
+  const { email, password } = req.body;
+
+  const admin = await User.findOne({ email });
+  if (!admin) return res.status(401).json({ message: 'Invalid email or password' });
+
+  const isMatch = await admin.matchPassword(password);
+  if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
+
+  // Save session
+  req.session.adminId = admin._id;
+  return res.status(200).json({ message: 'Login successful' });
+};
+
+// Middleware to protect admin routes
+export const requireAdmin = (req, res, next) => {
+  if (!req.session.adminId) {
+    return res.redirect('/admin/login');
+  }
+  next();
+};
+
+// Logout
+export const adminLogout = (req, res) => {
+    req.session.destroy(() => {
+        res.redirect("/admin/login");
+    });
+};
+
 
 // Dashboard
 export const adminDashboard = async (req, res) => {

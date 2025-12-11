@@ -8,11 +8,14 @@ import transactionRoutes from "./routes/transactionRoutes.js";
 import ordersRoutes from "./routes/orderRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import productsRoutes from "./routes/productRoutes.js";
+import ticketRoutes from "./routes/ticketRoutes.js";
 import path from 'path';
 import methodOverride from 'method-override';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import expressLayouts from "express-ejs-layouts";
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
 
 import { fileURLToPath } from 'url';
 
@@ -25,6 +28,14 @@ connectDB();
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'secret123', // strong secret
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+    cookie: { maxAge: 1000 * 60 * 60 * 2 } // 2 hours
+}));
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -41,9 +52,11 @@ app.use("/api/user", userRoutes);
 app.use("/api/transaction", transactionRoutes);
 app.use("/api/orders", ordersRoutes);
 app.use("/api/products", productsRoutes);
+app.use("/api/tickets", ticketRoutes);
 app.use("/admin", adminRoutes);
 
-app.get('/', (req, res) => res.redirect('/admin'));
+
+app.get('/', (req, res) => res.redirect('/admin/login'));
 
 app.use(notFound);
 app.use(errorHandler);

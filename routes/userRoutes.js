@@ -6,6 +6,7 @@ import {
   resetPassword,
   verifyOTP,
 } from "../controllers/userController.js";
+import { getAnalytics } from "../controllers/analyticsController.js";
 
 const router = express.Router();
 
@@ -14,5 +15,8 @@ router.post("/login", loginUser);
 router.post("/forgot-password", forgotPassword);
 router.post("/verify-otp", verifyOTP);
 router.post("/reset-password", resetPassword);
+
+// analytics
+router.get("/analytics", getAnalytics);
 
 export default router;
