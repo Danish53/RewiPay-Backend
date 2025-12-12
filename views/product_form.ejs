@@ -1,137 +1,157 @@
-
-
 <h1 class="mb-4" style="font-size: 26px; font-weight: 700;">
     <%= product ? 'Edit Product' : 'Add Product' %>
 </h1>
 
-<form action="<%= action %>" method="POST">
+<form id="productForm" 
+      action="<%= action %>" 
+      method="POST" 
+      enctype="multipart/form-data">
+
     <div class="row g-3">
+
+        <!-- NAME -->
         <div class="col-md-6">
-            <label class="form-label">Name</label>
-            <input name="name" value="<%= product ? product.name : '' %>" class="form-control" required />
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Brand</label>
-            <input name="brand" value="<%= product ? product.brand : '' %>" class="form-control" />
+            <label class="form-label">Name *</label>
+            <input name="name" 
+                   value="<%= product?.name || '' %>" 
+                   class="form-control required-field" />
+            <small class="text-danger error-msg"></small>
         </div>
 
-        <div class="col-12">
-            <label class="form-label">Short Description</label>
-            <input name="description" value="<%= product ? product.description : '' %>" class="form-control" />
+        <!-- BRAND -->
+        <div class="col-md-6">
+            <label class="form-label">Brand *</label>
+            <input name="brand" 
+                   value="<%= product?.brand || '' %>" 
+                   class="form-control required-field" />
+            <small class="text-danger error-msg"></small>
         </div>
 
+        <!-- SHORT DESC -->
         <div class="col-12">
-            <label class="form-label">Full Description</label>
+            <label class="form-label">Short Description *</label>
+            <input name="description" 
+                   value="<%= product?.description || '' %>" 
+                   class="form-control required-field" />
+            <small class="text-danger error-msg"></small>
+        </div>
+
+        <!-- FULL DESC -->
+        <div class="col-12">
+            <label class="form-label">Full Description *</label>
             <textarea name="fullDescription" rows="4"
-                class="form-control"><%= product ? product.fullDescription : '' %></textarea>
+                      class="form-control required-field"><%= product?.fullDescription || '' %></textarea>
+            <small class="text-danger error-msg"></small>
+        </div>
+
+        <!-- PRICE FIELDS -->
+        <div class="col-md-3">
+            <label class="form-label">Original Price *</label>
+            <input type="number" name="originalPrice" 
+                   value="<%= product?.originalPrice || '' %>" 
+                   class="form-control required-field" />
+            <small class="text-danger error-msg"></small>
         </div>
 
         <div class="col-md-3">
-            <label class="form-label">Original Price</label>
-            <input type="number" name="originalPrice" value="<%= product ? product.originalPrice : 0 %>"
-                class="form-control" />
+            <label class="form-label">Price *</label>
+            <input type="number" name="price" 
+                   value="<%= product?.price || '' %>" 
+                   class="form-control required-field" />
+            <small class="text-danger error-msg"></small>
         </div>
-        <div class="col-md-3">
-            <label class="form-label">Price</label>
-            <input type="number" name="price" value="<%= product ? product.price : 0 %>" class="form-control" />
-        </div>
+
         <div class="col-md-3">
             <label class="form-label">Discount (%)</label>
-            <input type="number" name="discount" value="<%= product ? product.discount : 0 %>" class="form-control" />
-        </div>
-        <div class="col-md-3">
-            <label class="form-label">Category</label>
-            <input name="category" value="<%= product ? product.category : '' %>" class="form-control" />
+            <input type="number" name="discount"
+                   value="<%= product?.discount || 0 %>" 
+                   class="form-control" />
         </div>
 
+        <div class="col-md-3">
+            <label class="form-label">Category *</label>
+            <input name="category"
+                   value="<%= product?.category || '' %>" 
+                   class="form-control required-field" />
+            <small class="text-danger error-msg"></small>
+        </div>
+
+        <!-- FILE UPLOAD -->
         <div class="col-md-4">
-            <label class="form-label">Main Image URL</label>
-            <input name="image" value="<%= product ? product.image : '' %>" class="form-control" />
+            <label class="form-label">Main Image (File)</label>
+            <input type="file" name="image" class="form-control" accept="image/*" />
+            <% if(product?.image){ %>
+                <small>Current: <%= product.image %></small>
+            <% } %>
         </div>
 
         <div class="col-md-8">
-            <label class="form-label">Images (comma separated URLs)</label>
-            <input name="images" value="<%= product ? product.images && product.images.join(',') : '' %>"
-                class="form-control" />
+            <label class="form-label">Upload Multiple Images</label>
+            <input type="file" name="images" class="form-control" accept="image/*" multiple />
+            <% if(product?.images){ %>
+                <small>Existing: <%= product.images.join(', ') %></small>
+            <% } %>
         </div>
 
+        <!-- FEATURES -->
         <div class="col-md-6">
-            <label class="form-label">Features (comma separated)</label>
-            <input name="features" value="<%= product ? product.features && product.features.join(',') : '' %>"
-                class="form-control" />
+            <label class="form-label">Features (comma separated) *</label>
+            <input name="features" 
+                   value="<%= product?.features?.join(',') || '' %>" 
+                   class="form-control required-field" />
+            <small class="text-danger error-msg"></small>
         </div>
 
-        <div class="col-md-2">
-            <label class="form-label">Rating</label>
-            <input type="number" step="0.1" name="rating" value="<%= product ? product.rating : 0 %>"
-                class="form-control" />
-        </div>
-        <div class="col-md-2">
-            <label class="form-label">Reviews</label>
-            <input type="number" name="reviews" value="<%= product ? product.reviews : 0 %>" class="form-control" />
-        </div>
+        <!-- STOCK -->
         <div class="col-md-2 d-flex align-items-center">
             <div class="form-check mt-3">
-                <input class="form-check-input" type="checkbox" name="inStock" value="true" <%=product &&
-                    product.inStock ? 'checked' : '' %> />
+                <input class="form-check-input" type="checkbox" name="inStock" value="true"
+                    <%= product?.inStock ? 'checked' : '' %> />
                 <label class="form-check-label">In Stock</label>
             </div>
         </div>
 
+        <!-- BUTTONS -->
         <div class="col-12">
             <button class="btn btn-success">Save</button>
             <a href="/admin/products" class="btn btn-secondary">Cancel</a>
         </div>
+
     </div>
 </form>
 
-
 <script>
-const form = document.getElementById('productForm');
+/* ============================
+   REAL-TIME VALIDATION
+============================ */
+document.getElementById('productForm').addEventListener('submit', function (e) {
+    let isValid = true;
 
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(form);
-    const data = {};
-
-    formData.forEach((value, key) => {
-        // convert numbers
-        if(['originalPrice','price','discount','rating','reviews'].includes(key)) {
-            data[key] = Number(value);
-        } else if(key === 'inStock') {
-            data[key] = value === 'true' ? true : false;
-        } else if(key === 'features' || key === 'images') {
-            data[key] = value.split(',').map(v => v.trim()).filter(Boolean);
+    document.querySelectorAll(".required-field").forEach(input => {
+        const error = input.nextElementSibling;
+        if (input.value.trim() === "") {
+            input.style.border = "2px solid red";
+            error.innerText = "This field is required";
+            isValid = false;
         } else {
-            data[key] = value;
+            input.style.border = "";
+            error.innerText = "";
         }
     });
 
-    try {
-        const url = "<%= product ? '/admin/products/' + product.id : '/admin/products' %>";
-        const method = "<%= product ? 'PUT' : 'POST' %>";
+    if (!isValid) {
+        e.preventDefault();
+        alert("Please fill all required fields!");
+    }
 
-        const res = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        const result = await res.json();
-
-        if(res.ok) {
-            alert('Product saved successfully!');
-            window.location.href = '/admin/products';
-        } else {
-            alert(result.message || 'Error saving product');
-        }
-
-    } catch (err) {
-        console.error(err);
-        alert('Something went wrong');
+    // Handle false checkbox submit
+    const inStock = this.querySelector('input[name="inStock"]');
+    if (!inStock.checked) {
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'inStock';
+        hidden.value = 'false';
+        this.appendChild(hidden);
     }
 });
 </script>

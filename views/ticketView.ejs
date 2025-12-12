@@ -1,0 +1,62 @@
+<h2>Ticket: <%= ticket.subject %></h2>
+<p><%= ticket.description %></p>
+<p>User: <%= ticket.userId ? ticket.userId.name + ' | ' + ticket.userId.email : 'Unknown User' %></p>
+<p>Priority: <%= ticket.priority %> | Status: <%= ticket.status %></p>
+
+<div id="replies" style="border:1px solid #444; padding:10px; max-height:300px; overflow-y:auto;">
+  <% replies.forEach(r => { %>
+    <div style="margin-bottom:10px;">
+      <strong><%= r.senderType==='admin'? 'Admin': r.sender.name %>:</strong>
+      <p><%= r.message %></p>
+      <% if(r.image) { %>
+        <img src="<%= r.image %>" width="100" />
+      <% } %>
+      <span style="font-size:10px; color:#aaa;"><%= r.createdAt.toLocaleString() %></span>
+    </div>
+  <% }) %>
+</div>
+
+<form id="replyForm">
+  <textarea id="replyMessage" placeholder="Type your reply" required></textarea>
+  <input type="file" id="replyImage"/>
+  <button type="submit">Send Reply</button>
+</form>
+
+<script>
+const adminToken = "<%= adminToken %>";
+
+$('#replyForm').submit(async function(e){
+    e.preventDefault();
+    const message = $('#replyMessage').val();
+    const fileInput = $('#replyImage')[0].files[0];
+    const formData = new FormData();
+    formData.append('message', message);
+    if(fileInput) formData.append('image', fileInput);
+
+    if (!adminToken) {
+        alert("Session expired. Please login again.");
+        window.location.href = "/admin/login";
+        return;
+    }
+
+    try {
+      const res = await fetch(`/admin/tickets/<%= ticket._id %>/reply`, {
+        method:'POST',
+        headers: { 'Authorization': 'Bearer ' + adminToken },
+        body: formData
+      });
+
+      const data = await res.json();
+      if(!res.ok) {
+          alert(data.message || 'Failed to send reply');
+      } else {
+          alert('Reply sent!');
+          location.reload();
+      }
+
+    } catch(err){
+      console.error(err);
+      alert('Failed to send reply');
+    }
+});
+</script>

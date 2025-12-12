@@ -8,8 +8,14 @@ const ticketSchema = new mongoose.Schema(
     priority: { type: String, default: "Low" },
     type: { type: String },
     channel: { type: String },
-    tags: [{ type: String }],
-    image: String
+    tags: [{ type: String }], 
+    image: String,
+    status: {
+      type: String,
+      enum: ["open", "pending", "resolved", "closed"],
+      default: "open",
+    },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );

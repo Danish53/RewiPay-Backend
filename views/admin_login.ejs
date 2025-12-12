@@ -28,43 +28,49 @@
     </div>
   </div>
 
-  <script>
-    const form = document.getElementById('adminLoginForm');
-    const alertContainer = document.getElementById('alertContainer');
+<script>
+  const form = document.getElementById('adminLoginForm');
+  const alertContainer = document.getElementById('alertContainer');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault(); // prevent default form submit
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      alertContainer.innerHTML = ''; // clear previous messages
+    alertContainer.innerHTML = '';
 
-      const formData = new FormData(form);
-      const data = {
-        email: formData.get('email'),
-        password: formData.get('password')
-      };
+    const formData = new FormData(form);
+    const data = {
+      email: formData.get('email'),
+      password: formData.get('password')
+    };
 
-      try {
-        const res = await fetch('/admin/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
+    try {
+      const res = await fetch('/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
 
-        const result = await res.json();
+      const result = await res.json();
 
-        if (res.ok) {
-          // Redirect to admin dashboard after successful login
-          window.location.href = '/admin/dashboard';
-        } else {
-          // Show error message
-          alertContainer.innerHTML = `<div class="alert alert-danger">${result.message || 'Login failed'}</div>`;
-        }
-      } catch (err) {
-        console.error(err);
-        alertContainer.innerHTML = `<div class="alert alert-danger">Something went wrong</div>`;
+      if (res.ok) {
+
+        // SAVE TOKEN CORRECTLY
+        localStorage.setItem("adminToken", result.token);
+
+        // Redirect after login
+        window.location.href = '/admin/dashboard';
+
+      } else {
+        alertContainer.innerHTML = `<div class="alert alert-danger">${result.message || 'Login failed'}</div>`;
       }
-    });
-  </script>
+
+    } catch (err) {
+      console.error(err);
+      alertContainer.innerHTML = `<div class="alert alert-danger">Something went wrong</div>`;
+    }
+  });
+</script>
+
 
 </body>
 </html>

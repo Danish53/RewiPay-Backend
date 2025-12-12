@@ -1,7 +1,8 @@
 <h1 class="mb-4" style="font-size: 26px; font-weight: 700;">Products</h1>
+
 <div class="table-responsive">
   <table class="table table-striped align-middle" id="productsTable">
-    <thead>
+    <thead class="table-dark">
       <tr>
         <th>Image</th>
         <th>Name</th>
@@ -12,55 +13,101 @@
         <th>Actions</th>
       </tr>
     </thead>
+
     <tbody>
-      <% products.forEach(p => { %>
+      <% products.forEach(p=> { %>
         <tr data-id="<%= p.id %>">
+
+          <!-- IMAGE -->
           <td style="width:80px">
-            <img src="<%= p.image || (p.images && p.images[0]) || '/placeholder.png' %>" alt="" class="img-fluid rounded" style="max-height:60px">
+            <img src="<%= p.image || (p.images && p.images[0]) || '/placeholder.png' %>" class="img-fluid rounded"
+              style="max-height:60px">
           </td>
-          <td><strong><%= p.name %></strong><div class="text-muted small"><%= p.brand %></div></td>
-          <td><%= p.category %></td>
-          <td><%= p.price %></td>
-          <td><%= p.inStock ? 'In Stock' : 'Out' %></td>
-          <td><%= p.rating %> (<%= p.reviews %>)</td>
+
+          <!-- NAME + BRAND -->
           <td>
-            <a class="btn btn-sm btn-outline-primary" href="/admin/products/<%= p.id %>/edit">Edit</a>
+            <strong>
+              <%= p.name %>
+            </strong>
+            <div class="text-muted small">
+              <%= p.brand %>
+            </div>
+          </td>
+
+          <!-- CATEGORY -->
+          <td>
+            <%= p.category %>
+          </td>
+
+          <!-- PRICE -->
+          <td>$<%= p.price %>
+          </td>
+
+          <!-- STOCK -->
+          <td>
+            <% if(p.inStock) { %>
+              <span class="badge bg-success">In Stock</span>
+              <% } else { %>
+                <span class="badge bg-danger">Out</span>
+                <% } %>
+          </td>
+
+          <!-- RATING -->
+          <td>
+            <%= p.rating %> (<%= p.reviews %>)
+          </td>
+
+          <!-- ACTION BUTTONS -->
+          <td>
+            <a class="btn btn-sm btn-outline-primary" href="/admin/products/<%= p.id %>/edit">
+              Edit
+            </a>
+
             <button class="btn btn-sm btn-danger deleteBtn">Delete</button>
           </td>
+
         </tr>
-      <% }) %>
+        <% }) %>
     </tbody>
   </table>
 </div>
 
 <script>
-// DELETE PRODUCT
-document.querySelectorAll('.deleteBtn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-        const row = e.target.closest('tr');
-        const productId = row.dataset.id;
-
-        if(confirm('Are you sure you want to delete this product?')) {
-            try {
-                const res = await fetch(`/admin/products/${productId}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                const data = await res.json();
-
-                if(res.ok) {
-                    row.remove(); // row delete ho jayega without page reload
-                    alert(data.message || 'Product deleted successfully');
-                } else {
-                    alert(data.message || 'Error deleting product');
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Something went wrong');
-            }
-        }
+  // Initialize DataTable
+  $(document).ready(function () {
+    $('#productsTable').DataTable({
+      pageLength: 5,
+      lengthMenu: [5, 10, 20, 50],
+      order: [[1, "asc"]]  // sort by Name
     });
-});
+  });
 
+  // DELETE PRODUCT
+  document.querySelectorAll('.deleteBtn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const row = e.target.closest('tr');
+      const productId = row.dataset.id;
+
+      if (confirm('Are you sure you want to delete this product?')) {
+        try {
+          const res = await fetch(`/admin/products/${productId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+          });
+
+          const data = await res.json();
+
+          if (res.ok) {
+            row.remove();
+            alert(data.message || 'Product deleted successfully');
+          } else {
+            alert(data.message || 'Error deleting product');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Something went wrong');
+        }
+      }
+    });
+  });
 </script>

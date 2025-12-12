@@ -1,0 +1,130 @@
+<h1 class="mb-4" style="font-size: 26px; font-weight: 700;">Tickets</h1>
+
+<div class="table-responsive">
+    <table class="table table-striped align-middle" id="ticketsTable">
+        <thead class="table-dark">
+            <tr>
+                <th>Image</th>
+                <th>Subject</th>
+                <th>Agent</th>
+                <th>Priority</th>
+                <th>Type</th>
+                <th>Channel</th>
+                <th>Tags</th>
+                <th>Created At</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <% tickets.forEach(t=> { %>
+                <tr data-id="<%= t._id %>">
+                    <td style="width:80px">
+                        <img src="<%= t.image || '/placeholder.png' %>" class="img-fluid rounded"
+                            style="max-height:60px">
+                    </td>
+
+                    <td>
+                        <strong>
+                            <%= t.subject %>
+                        </strong>
+                        <div class="text-muted small">
+                            <%= t.description.slice(0, 40) %>...
+                        </div>
+                        <div class="text-muted small">
+                            <% if (t.userId) { %>
+                                <%= t.userId.name %> | <%= t.userId.email %>
+                                        <% } else { %>
+                                            Unknown User
+                                            <% } %>
+                        </div> 
+
+                    </td>
+
+                    <td>
+                        <%= t.agent || 'Unassigned' %>
+                    </td>
+
+                    <td>
+                        <% if(t.priority==='High' ) { %>
+                            <span class="badge bg-danger">High</span>
+                            <% } else if(t.priority==='Medium' ) { %>
+                                <span class="badge bg-warning text-dark">Medium</span>
+                                <% } else { %>
+                                    <span class="badge bg-success">Low</span>
+                                    <% } %>
+                    </td>
+
+                    <td>
+                        <%= t.type || 'N/A' %>
+                    </td>
+                    <td>
+                        <%= t.channel || 'N/A' %>
+                    </td>
+
+                    <td>
+                        <% t.tags.forEach(tag=> { %>
+                            <span class="badge bg-primary me-1">
+                                <%= tag %>
+                            </span>
+                            <% }) %>
+                    </td>
+
+                    <td>
+                        <%= t.createdAt.toLocaleDateString() %>
+                    </td>
+
+                    <!-- Status Dropdown -->
+                    <td>
+                        <select class="form-select statusSelect" data-id="<%= t._id %>">
+                            <option value="open" <%=t.status==='open' ?'selected':'' %>>Open</option>
+                            <option value="pending" <%=t.status==='pending' ?'selected':'' %>>Pending</option>
+                            <option value="resolved" <%=t.status==='resolved' ?'selected':'' %>>Resolved</option>
+                            <option value="closed" <%=t.status==='closed' ?'selected':'' %>>Closed</option>
+                        </select>
+                    </td>
+
+                    <td>
+                        <a href="/admin/ticket/<%= t._id %>" class="btn btn-sm btn-primary">View</a>
+                    </td>
+
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const adminToken = "<%= adminToken %>";
+    console.log("adminToken:", adminToken);
+
+    if (!adminToken) {
+        alert("Session expired. Please login again.");
+        window.location.href = "/admin/login";
+    }
+
+    $('.statusSelect').change(async function() {
+        const ticketId = $(this).data('id');
+        const status = $(this).val();
+
+        try {
+            const res = await fetch(`/admin/tickets/${ticketId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + adminToken
+                },
+                body: JSON.stringify({ status })
+            });
+
+            const data = await res.json();
+            if (!res.ok) alert(data.message || 'Update failed');
+            else alert('Status updated: ' + data.status);
+
+        } catch (err) {
+            console.error(err);
+            alert('Failed to update status');
+        }
+    });
+</script>
