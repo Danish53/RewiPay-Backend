@@ -1,7 +1,8 @@
 import express from "express";
-import { addReplyAdmin, adminDashboard, adminLogin, adminLoginForm, adminLogout, createProduct, deleteProduct, editProductForm, getProducts, getRepliesAdmin, getTicketsAll, newProductForm, updateProduct, updateTicketStatus } from "../controllers/adminController.js";
+import { addReplyAdmin, adminDashboard, adminLogin, adminLoginForm, adminLogout, createProduct, createRewardLevel, deleteProduct, editProductForm, getProducts, getRepliesAdmin, getRewardLevels, getTicketsAll, newProductForm, updateProduct, updateTicketStatus } from "../controllers/adminController.js";
 import upload from "../middlewares/upload.js";
 import { isAdmin } from "../middlewares/authAdmin.js";
+import RewardLevel from "../models/RewardLevel.js";
 
 const router = express.Router();
 
@@ -19,12 +20,12 @@ router.get("/products/new", newProductForm);
 router.post("/products", upload.fields([
     { name: "image", maxCount: 1 },
     { name: "images", maxCount: 10 }
-]) , createProduct);
+]), createProduct);
 router.get("/products/:id/edit", editProductForm);
 router.put("/products/:id", upload.fields([
     { name: "image", maxCount: 1 },
     { name: "images", maxCount: 10 }
-]) , updateProduct);
+]), updateProduct);
 
 router.delete("/products/:id", deleteProduct);
 
@@ -37,8 +38,8 @@ router.get("/ticket/:id", async (req, res) => {
 
     const ticket = await Ticket.findById(req.params.id).populate("userId", "name email");
     const replies = await TicketReply.find({ ticketId: req.params.id })
-                        .populate("sender", "name email")
-                        .sort({ createdAt: 1 });
+        .populate("sender", "name email")
+        .sort({ createdAt: 1 });
 
     const token = req.cookies.adminToken; // Get token from cookie
     res.render("ticketView", { ticket, replies, adminToken: token });
@@ -52,5 +53,16 @@ router.post("/tickets/:id/reply", isAdmin, upload.single("image"), addReplyAdmin
 
 // Get replies (optional API)
 router.get("/tickets/:id/replies", isAdmin, getRepliesAdmin);
+
+// rewards
+router.get("/rewards", isAdmin, async (req, res) => {
+    const levels = await RewardLevel.find().sort({ startAmount: 1 });
+    res.render("rewards", {
+        levels,
+        adminToken: req.token
+    });
+});
+router.post("/rewards/levels", isAdmin, createRewardLevel);
+router.get("/rewards/levels", isAdmin, getRewardLevels);
 
 export default router;

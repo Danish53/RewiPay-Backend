@@ -1,0 +1,19 @@
+<h2>Create Reward Level</h2>
+
+<form method="POST" action="/admin/rewards/levels">
+  <input name="startAmount" type="number" placeholder="Start Amount" required />
+  <input name="endAmount" type="number" placeholder="End Amount" required />
+  <input name="rewardToken" type="number" placeholder="Reward Tokens" required />
+  <button type="submit">Create</button>
+</form>
+
+<hr/>
+
+<h3>Existing Levels</h3>
+<ul>
+  <% levels.forEach(l => { %>
+    <li>
+      <%= l.startAmount %> - <%= l.endAmount %> INR → <%= l.rewardToken %> Tokens
+    </li>
+  <% }) %>
+</ul>

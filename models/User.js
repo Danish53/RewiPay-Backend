@@ -14,7 +14,17 @@ const userSchema = new mongoose.Schema(
         password: { type: String, required: [true, "Password is required"], minlength: 8 },
         resetPasswordToken: String,
         resetPasswordExpire: Date,
-        role: { type: String, enum: ["user", "admin"], default: "user" }
+        role: { type: String, enum: ["user", "admin"], default: "user" },
+        rewards: {
+            totalEarnedTokens: { type: Number, default: 0 },
+            completedLevels: [
+                {
+                    levelId: { type: mongoose.Schema.Types.ObjectId, ref: "RewardLevel" },
+                    completedAt: Date
+                }
+            ]
+        }
+
     },
     { timestamps: true }
 );

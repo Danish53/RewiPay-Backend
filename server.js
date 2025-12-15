@@ -9,6 +9,7 @@ import ordersRoutes from "./routes/orderRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import productsRoutes from "./routes/productRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
+import rewardsRoutes from "./routes/rewardsRoute.js";
 import path from 'path';
 import methodOverride from 'method-override';
 import morgan from 'morgan';
@@ -57,6 +58,7 @@ app.use("/api/transaction", transactionRoutes);
 app.use("/api/orders", ordersRoutes);
 app.use("/api/products", productsRoutes);
 app.use("/api/tickets", ticketRoutes);
+app.use("/api/rewards", rewardsRoutes);
 app.use("/admin", adminRoutes);
 
 

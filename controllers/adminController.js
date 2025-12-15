@@ -8,6 +8,7 @@ import asyncHandler from "express-async-handler";
 import jwt from "jsonwebtoken";
 import TicketReply from "../models/ticketReply.js";
 import { sendEmail } from "../config/mailer.js";
+import RewardLevel from "../models/RewardLevel.js";
 
 // auth admin
 export const adminLoginForm = (req, res) => {
@@ -266,6 +267,32 @@ export const getRepliesAdmin = asyncHandler(async (req, res) => {
 
   res.json(replies); 
 });
+
+
+// rewards
+/**
+ * CREATE reward level
+ */
+export const createRewardLevel = asyncHandler(async (req, res) => {
+  const { startAmount, endAmount, rewardToken } = req.body;
+
+  const level = await RewardLevel.create({
+    startAmount,
+    endAmount,
+    rewardToken
+  });
+
+  res.json(level);
+});
+
+/**
+ * GET all levels
+ */
+export const getRewardLevels = asyncHandler(async (req, res) => {
+  const levels = await RewardLevel.find().sort({ startAmount: 1 });
+  res.json(levels);
+});
+
 
 
 
